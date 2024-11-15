@@ -51,7 +51,7 @@
     },
     "private": true,
     "resolutions": {
-        "@google-cloud/firestore": "^7.10.0", // Correct version,
+        "@google-cloud/firestore": "^7.10.0", 
         "@grpc/grpc-js": "^1.8.22",
         "protobufjs": "^6.11.4"
     }
