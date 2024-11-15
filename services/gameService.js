@@ -1,6 +1,6 @@
 // src/services/gameService.js
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 
 /**
  * Adds a new game to the Firestore `Games` collection.

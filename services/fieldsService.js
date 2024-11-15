@@ -1,6 +1,6 @@
 // src/services/fieldsService.js
 import { collection, getDocs, query, where, doc, setDoc } from "firebase/firestore";
-import { db } from "../firebaseConfig"; // Ensure firebaseConfig is set up
+import { auth, db } from "../firebaseConfig"; // Ensure firebaseConfig is set up
 
 /**
  * Fetches all fields from the Firestore `Fields` collection.

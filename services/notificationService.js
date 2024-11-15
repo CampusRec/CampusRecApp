@@ -1,6 +1,6 @@
 // src/services/notificationService.js
 import { collection, addDoc, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 
 /**
  * Adds a notification to the Firestore `Notifications` collection.

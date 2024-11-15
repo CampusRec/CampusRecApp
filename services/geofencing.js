@@ -2,7 +2,7 @@
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import { addNotification } from "../services/notificationService";
 
 const GEOFENCE_TASK = "geofence-task";

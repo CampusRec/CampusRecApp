@@ -1,7 +1,7 @@
 // src/services/geofirestore.js
 import { collection } from "firebase/firestore";
 import { GeoFirestore } from "geofirestore";
-import { db } from "../firebaseConfig"; // Ensure this points to the correct Firebase setup
+import { auth, db } from "../firebaseConfig"; // Ensure this points to the correct Firebase setup
 
 /**
  * Fetches fields within a specified radius of a given latitude and longitude.
