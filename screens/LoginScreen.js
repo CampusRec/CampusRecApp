@@ -9,7 +9,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { login } from "../services/authService"; // Updated import
+import { login } from "./services/authService"; // Updated import
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
