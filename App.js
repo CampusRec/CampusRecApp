@@ -5,26 +5,42 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 
-import MapScreen from "./src/repos/CampusRecApp/screens/MapScreen";
-import GamesScreen from "./src/screens/GamesScreen";
-import TeamsScreen from "./src/screens/TeamsScreen";
-import ProfileScreen from "./src/screens/ProfileScreen";
-import LoginScreen from "./src/screens/LoginScreen";
-import SignupScreen from "./src/screens/SignupScreen";
+// Import screens
+import MapScreen from "./screens/MapScreen";
+import GamesScreen from "./screens/GamesScreen";
+import TeamsScreen from "./screens/TeamsScreen";
+import ProfileScreen from "./screens/ProfileScreen";
+import LoginScreen from "./screens/LoginScreen";
+import SignupScreen from "./screens/SignupScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+/**
+ * MainTabs component contains the bottom tab navigator for the main app screens.
+ */
 function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          if (route.name === "Map") iconName = "map";
-          else if (route.name === "Games") iconName = "list";
-          else if (route.name === "Teams") iconName = "people";
-          else if (route.name === "Profile") iconName = "person";
+          switch (route.name) {
+            case "Map":
+              iconName = "map";
+              break;
+            case "Games":
+              iconName = "list";
+              break;
+            case "Teams":
+              iconName = "people";
+              break;
+            case "Profile":
+              iconName = "person";
+              break;
+            default:
+              iconName = "ellipse";
+          }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "#1e88e5",
@@ -41,15 +57,18 @@ function MainTabs() {
   );
 }
 
+/**
+ * App component manages the overall navigation flow of the app.
+ */
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="LoginScreen" screenOptions={{ headerShown: false }}>
         {/* Authentication Screens */}
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name="SignupScreen" component={SignupScreen} />
 
-        {/* Main App Tabs */}
+        {/* Main Application Tabs */}
         <Stack.Screen name="MainTabs" component={MainTabs} />
       </Stack.Navigator>
     </NavigationContainer>
