@@ -1,135 +1,69 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+// src/screens/MapScreen.js
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, Alert, Text, Switch } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebaseConfig"; // Ensure firebaseConfig is correctly set up
+import * as Location from "expo-location";
+import { checkLocationForFields } from "../services/geofencing";
 
 export default function MapScreen() {
-  const [games, setGames] = useState([]); // Games fetched from Firestore
-  const [selectedGame, setSelectedGame] = useState(null); // Currently selected game
+  const [fields, setFields] = useState([]);
+  const [geofencingEnabled, setGeofencingEnabled] = useState(false);
 
-  // Fetch games from Firestore
   useEffect(() => {
-    const fetchGames = async () => {
-      const snapshot = await getDocs(collection(db, "Games"));
-      const gamesData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setGames(gamesData);
+    const fetchFields = async () => {
+      try {
+        const fieldsData = await checkLocationForFields();
+        setFields(fieldsData);
+      } catch (error) {
+        console.error("Error loading fields:", error);
+        Alert.alert("Error", "Failed to load fields. Please try again.");
+      }
     };
 
-    fetchGames();
-  }, []);
+    if (geofencingEnabled) {
+      fetchFields();
+    } else {
+      setFields([]);
+    }
+  }, [geofencingEnabled]);
 
-  return (
-    <View style={styles.container}>
-      {/* MapView with Markers */}
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: 37.78825, // Example coordinates
-          longitude: -122.4324,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-      >
-        {games.map((game) => (
-          <Marker
-            key={game.id}
-            coordinate={game.coords}
-            title={game.title}
-            description={`Availability: ${game.availability}`}
-            onPress={() => setSelectedGame(game)}
-          />
-        ))}
-      </MapView>
-
-      {/* Dynamic Game Card */}
-      {selectedGame && (
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{selectedGame.title}</Text>
-          <Text style={styles.cardSubtitle}>Location: {selectedGame.location}</Text>
-          <Text style={styles.cardSubtitle}>
-            Availability: {selectedGame.availability}
-          </Text>
-          <TouchableOpacity style={styles.cardButton}>
-            <Text style={styles.cardButtonText}>Join Game</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212",
-  },
-  map: {
-    flex: 1,
-  },
-  card: {
-    backgroundColor: "#1e88e5",
-    padding: 20,
-    borderRadius: 10,
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
-  },
-  cardTitle: {
-    fontSize: 18,
-    color: "#ffffff",
-    fontWeight: "bold",
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: "#e3f2fd",
-    marginVertical: 5,
-  },
-  cardButton: {
-    backgroundColor: "#fdd835",
-    padding: 10,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  cardButtonText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#1e88e5",
-  },
-});
-import React, { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
-import MapView, { Marker } from "react-native-maps";
-import { checkLocationForFields } from "../services/geofencing"; // Import geofencing function
-
-export default function MapScreen() {
-  useEffect(() => {
-    // Request location permissions and check geofence
-    const startGeofencing = async () => {
-      await checkLocationForFields();
-    };
-
-    startGeofencing();
-  }, []); // Empty dependency array ensures this runs once on component mount
+  const toggleGeofencing = () => {
+    setGeofencingEnabled((prevState) => !prevState);
+  };
 
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: 37.78825, // Example coordinates
-          longitude: -122.4324,
+          latitude: 30.4419,
+          longitude: -84.2985,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
       >
-        {/* Add Marker components dynamically based on your fields */}
+        {fields.map((field) => (
+          <Marker
+            key={field.id}
+            coordinate={{
+              latitude: field.location.latitude,
+              longitude: field.location.longitude,
+            }}
+            title={field.fieldName}
+            description={`Type: ${field.type}, University: ${field.university}`}
+          />
+        ))}
       </MapView>
+
+      <View style={styles.toggleContainer}>
+        <Text style={styles.toggleLabel}>Enable Geofencing</Text>
+        <Switch
+          value={geofencingEnabled}
+          onValueChange={toggleGeofencing}
+          trackColor={{ false: "#767577", true: "#1e88e5" }}
+          thumbColor={geofencingEnabled ? "#43a047" : "#f4f3f4"}
+        />
+      </View>
     </View>
   );
 }
@@ -140,5 +74,20 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  toggleContainer: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 10,
+    elevation: 3,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  toggleLabel: {
+    fontSize: 14,
+    marginRight: 10,
   },
 });

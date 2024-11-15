@@ -1,157 +1,93 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+// src/screens/ProfileScreen.js
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import { fetchUserData, updateUserData } from "../services/authService"; // Updated imports
+import { auth } from "../firebaseConfig"; // Firebase auth for current user
 
-export default function ProfilePage() {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [selectedUniversity, setSelectedUniversity] = useState('');
-  const [selectedEmoji, setSelectedEmoji] = useState('⚽'); // Default emoji
+export default function ProfileScreen() {
+  const [form, setForm] = useState({
+    displayName: "",
+    favoriteSports: [],
+    university: "",
+  });
+  const [loading, setLoading] = useState(true);
 
-  const universitiesInFlorida = [
-    'University of Florida',
-    'Florida State University',
-    'University of Miami',
-    'University of Central Florida',
-    'Florida International University',
-  ];
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const userId = auth.currentUser.uid;
+        const data = await fetchUserData(userId); // Fetch user data
+        setForm(data);
+      } catch (error) {
+        console.error("Error loading user data:", error);
+        Alert.alert("Error", "Failed to load user data.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const sportsEmojis = ['⚽', '🏀', '🏐', '🎾', '🥏'];
+    loadUserData();
+  }, []);
+
+  const handleUpdateProfile = async () => {
+    try {
+      const userId = auth.currentUser.uid;
+      await updateUserData(userId, {
+        favoriteSports: form.favoriteSports,
+        university: form.university,
+      }); // Update user data
+      Alert.alert("Success", "Profile updated successfully.");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Alert.alert("Error", "Failed to update profile.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#1e88e5" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Profile</Text>
+      <Text style={styles.header}>Profile</Text>
 
-      {/* Profile Picture Selection */}
-      <Text style={styles.label}>Select a Profile Emoji:</Text>
-      <View style={styles.emojiContainer}>
-        {sportsEmojis.map((emoji) => (
-          <TouchableOpacity
-            key={emoji}
-            style={[
-              styles.emojiButton,
-              selectedEmoji === emoji && styles.selectedEmojiButton,
-            ]}
-            onPress={() => setSelectedEmoji(emoji)}
-          >
-            <Text style={styles.emoji}>{emoji}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Phone Number Input */}
       <TextInput
         style={styles.input}
-        placeholder="Enter your phone number"
+        placeholder="University"
         placeholderTextColor="#bdbdbd"
-        keyboardType="phone-pad"
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
+        value={form.university}
+        onChangeText={(text) => setForm({ ...form, university: text })}
       />
 
-      {/* University Dropdown */}
-      <Text style={styles.label}>Select Your University:</Text>
-      <View style={styles.dropdown}>
-        <Text style={styles.selectedValue}>
-          {selectedUniversity || 'Select a university'}
-        </Text>
-        <View style={styles.dropdownOptions}>
-          {universitiesInFlorida.map((university) => (
-            <TouchableOpacity
-              key={university}
-              style={styles.dropdownOption}
-              onPress={() => setSelectedUniversity(university)}
-            >
-              <Text style={styles.optionText}>{university}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      {/* Save Button */}
-      <TouchableOpacity style={styles.saveButton}>
-        <Text style={styles.saveButtonText}>Save Profile</Text>
+      <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile}>
+        <Text style={styles.updateButtonText}>Update Profile</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fdd835',
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    color: '#bdbdbd',
-    marginBottom: 10,
-    alignSelf: 'flex-start',
-  },
-  emojiContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  emojiButton: {
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: '#333',
-    marginHorizontal: 5,
-  },
-  selectedEmojiButton: {
-    backgroundColor: '#fdd835',
-  },
-  emoji: {
-    fontSize: 28,
-    color: '#fff',
-  },
+  container: { flex: 1, padding: 20, backgroundColor: "#121212", justifyContent: "center" },
+  header: { fontSize: 24, fontWeight: "bold", color: "#fff", marginBottom: 20 },
   input: {
-    width: '100%',
-    padding: 10,
-    borderColor: '#555',
-    borderWidth: 1,
-    borderRadius: 8,
-    color: '#f5f5f5',
-    marginBottom: 20,
+    backgroundColor: "#1e88e5",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    color: "#fff",
   },
-  dropdown: {
-    width: '100%',
-    borderColor: '#555',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  selectedValue: {
-    padding: 10,
-    color: '#f5f5f5',
-  },
-  dropdownOptions: {
-    marginTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#555',
-  },
-  dropdownOption: {
-    padding: 10,
-    backgroundColor: '#333',
-  },
-  optionText: {
-    color: '#f5f5f5',
-  },
-  saveButton: {
-    backgroundColor: '#fdd835',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#121212',
-  },
+  updateButton: { backgroundColor: "#43a047", padding: 15, borderRadius: 10, alignItems: "center" },
+  updateButtonText: { fontSize: 16, fontWeight: "bold", color: "#fff" },
 });
