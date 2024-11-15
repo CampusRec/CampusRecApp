@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 
-import MapScreen from "./src/screens/MapScreen";
+import MapScreen from "./src/screens/MapScreen.js";
 import GamesScreen from "./src/screens/GamesScreen";
 import TeamsScreen from "./src/screens/TeamsScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
