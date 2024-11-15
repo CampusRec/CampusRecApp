@@ -9,7 +9,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { fetchUserData, updateUserData } from "../services/authService"; // Updated imports
+import { fetchUserData, updateUserData } from "./services/authService"; // Updated imports
 import { auth, db } from "../firebaseConfig"; // Firebase auth for current user
 
 export default function ProfileScreen() {

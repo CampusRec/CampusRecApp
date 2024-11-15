@@ -9,7 +9,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { signup } from "../services/authService"; // Updated import
+import { signup } from "./services/authService"; // Updated import
 
 export default function SignupScreen({ navigation }) {
   const [form, setForm] = useState({
